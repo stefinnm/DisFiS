@@ -1,3 +1,5 @@
+import com.google.gson.JsonArray;
+
 import java.util.ArrayList;
 
 public class Metadata {
@@ -5,9 +7,9 @@ public class Metadata {
     private int numberOfPages;
     private int pageSize;
     private int size;
-    private ArrayList<Page> pages;
+    private JsonArray pages;
 
-    public Metadata(String n, int s, ArrayList<Page> p){
+    public Metadata(String n, int s, JsonArray p){
         name = n;
         numberOfPages = p.size();
         pageSize = 1024;

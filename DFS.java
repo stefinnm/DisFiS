@@ -48,31 +48,24 @@ import com.google.gson.stream.JsonWriter;
  */
 
 
-public class DFS
-{
+public class DFS {
     int port;
     Chord  chord;
     
-    private long md5(String objectName)
-    {
-        try
-        {
+    private long md5(String objectName) {
+        try {
             MessageDigest m = MessageDigest.getInstance("MD5");
             m.reset();
             m.update(objectName.getBytes());
             BigInteger bigInt = new BigInteger(1,m.digest());
             return Math.abs(bigInt.longValue());
-        }
-        catch(NoSuchAlgorithmException e)
-        {
-                e.printStackTrace();
-                
+
+        } catch(NoSuchAlgorithmException e) {
+            e.printStackTrace();
         }
         return 0;
     }
-    
-    
-    
+
     public DFS(int port) throws Exception {
         
         this.port = port;
@@ -90,14 +83,12 @@ public class DFS
         }
     }
     
-    public void join(String Ip, int port) throws Exception
-    {
+    public void join(String Ip, int port) throws Exception {
         chord.joinRing(Ip, port);
         chord.Print();
     }
     
-    public JsonReader readMetaData() throws Exception
-    {
+    public JsonReader readMetaData() throws Exception {
         //Gson jsonParser = null;
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
@@ -107,16 +98,14 @@ public class DFS
         return reader;
     }
     
-    public void writeMetaData(InputStream stream) throws Exception
-    {
+    public void writeMetaData(InputStream stream) throws Exception {
         //JsonParser jsonParser _ null;
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
         peer.put(guid, stream);
     }
    
-    public void mv(String oldName, String newName) throws Exception
-    {  
+    public void mv(String oldName, String newName) throws Exception {
         JsonParser jp = new JsonParser();
         JsonReader jr = readMetaData();
         JsonObject metaData = (JsonObject)jp.parse(jr);
@@ -146,11 +135,9 @@ public class DFS
         InputStream input = new FileStream(s.getBytes());
         writeMetaData(input);
     }
-
     
-    public String ls() throws Exception
-    {
-        System.out.println("Performing ls");
+    public String ls() throws Exception {
+        System.out.println("======= list =======");
         String listOfFiles = "";
      
         JsonReader jr = readMetaData();
@@ -175,87 +162,71 @@ public class DFS
         return listOfFiles;
     }
 
-    
-    public void touch(String fileName) throws Exception
-    {
-        // TODO: Create the file fileName by adding a new entry to the Metadata
-        // TODO: write files
-        File file = new File(fileName);
-        Scanner scnr = new Scanner(file);
+    public void touch(String fileName) throws Exception {
 
-        int size = (int) file.length();
+        Metadata meta = new Metadata(fileName, 0, new JsonArray());
+        Gson gson = new GsonBuilder().create();
 
-        ArrayList<Page> pages = new ArrayList<>();
+        String json = gson.toJson(meta);
 
-        //TODO split the file into pages and write to each page
-        FileInputStream input = new FileInputStream(fileName);
-        ObjectInputStream s = new ObjectInputStream(input);
-
-        byte[] buffer = new byte[1024];
-        int read = s.read(buffer);
-
-        while (read > 0) {
-            System.out.println("Read " + read);
-            read = s.read(buffer);
-        }
-
-
-
-
-
-
-
-        // TODO: Write Metadata
-        Metadata m = new Metadata(fileName, size, pages);
-
-        try (Writer writer = new FileWriter("Output.json")) {
-            Gson gson = new GsonBuilder().create();
-            gson.toJson(m, writer);
-        }
-    }
-    public void delete(String fileName) throws Exception
-    {
-        // TODO: remove all the pages in the entry fileName in the Metadata and then the entry
-        // for each page in Metadata.filename
-        //     peer = chord.locateSuccessor(page.guid);
-        //     peer.delete(page.guid)
-        // delete Metadata.filename
-        // Write Metadata
-        
         JsonParser jp = new JsonParser();
         JsonReader jr = readMetaData();
         JsonObject metaData = (JsonObject)jp.parse(jr);
         JsonArray ja = metaData.getAsJsonArray("metadata");
-        
-        int rmIndex = -1;
-        
+
+        JsonObject fileObj = new JsonParser().parse(json).getAsJsonObject();
+        ja.add(fileObj);
+
+        String s = metaData.toString();
+        InputStream input = new FileStream(s.getBytes());
+        writeMetaData(input);
+
+    }
+
+    public void delete(String fileName) throws Exception {
+
+        //create JsonArray
+        JsonParser jp = new JsonParser();
+        JsonObject metaData = (JsonObject)jp.parse(readMetaData());
+        JsonArray ja = metaData.getAsJsonArray("metadata");
+
+        //index to remove
+        int del = -1;
+
         for(int i = 0; i < ja.size(); i++){
+            //get JObj at index i
             JsonObject jo = ja.get(i).getAsJsonObject();
+
+            //get name of file - e.g. value of key "name" of this object
             String name = jo.get("name").getAsString();
             
             if(name.equals(fileName)){
-                JsonArray pages = jo.get("page").getAsJsonArray();
+
+                //get pages as JsonArray
+                JsonArray pages = jo.get("pages").getAsJsonArray();
+
+                //delete each page
                 for(int j = 0; j < pages.size(); j++){
                     JsonObject page = pages.get(j).getAsJsonObject();
-                    long guid = page.get("guid").getAsLong();
+                    long guid = md5("Metadata");
+                    long pGuid = page.get("guid").getAsLong();
                     
                     ChordMessageInterface peer = chord.locateSuccessor(guid);
-                    peer.delete(guid);
+                    peer.delete(pGuid);
                 }
+                del = i;
             }
-            rmIndex = i;
         }
-        if (rmIndex > -1) {
-            ja.remove(rmIndex);
+
+        if (del > -1) {
+            ja.remove(del);
             String s = metaData.toString();
             InputStream input = new FileStream(s.getBytes());
             writeMetaData(input);
         }
-        
     }
     
-    public byte[] read(String fileName, int pageNumber) throws Exception
-    {
+    public byte[] read(String fileName, int pageNumber) throws Exception {
         // TODO: read pageNumber from fileName
         
         JsonParser jp = new JsonParser();
