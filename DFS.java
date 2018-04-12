@@ -1,5 +1,3 @@
-import java.rmi.*;
-import java.net.*;
 import java.util.*;
 import java.io.*;
 import java.nio.file.*;
@@ -8,7 +6,6 @@ import java.security.*;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
-import com.google.gson.stream.JsonWriter;
 // import a json package
 
 
@@ -224,6 +221,8 @@ public class DFS {
             String s = metaData.toString();
             InputStream input = new FileStream(s.getBytes());
             writeMetaData(input);
+        } else {
+            System.out.println("There is no such file by that name.\n");
         }
     }
     
@@ -301,7 +300,7 @@ public class DFS {
 
             ArrayList<Page> pages = new ArrayList<>();
 
-            //TODO: if file has no pages - create new pages from toCopy
+            //If file has no pages - create new pages from toCopy
             if (pageArray.size() == 0){
                 int pageNumber = 1;
 
@@ -338,15 +337,15 @@ public class DFS {
 
             }else{
                 //TODO: else - get the last page and append
+                int pageNumber = pageArray.size();
+                int pageIndex = pageNumber - 1;
 
+                //TODO: tail(filename) + data
+                
             }
 
-
-
-            //TODO: delete metadata of file and write a new one
             //Delete old metadata
             delete(filename);
-
 
             //Write new metadata
             Gson ggson = new Gson();
@@ -356,7 +355,7 @@ public class DFS {
                 throw new Exception();
             }
 
-            Metadata meta = new Metadata(filename, size, element.getAsJsonArray());
+            Metadata meta = new Metadata(filename, size+data.length, element.getAsJsonArray());
             Gson gson = new GsonBuilder().create();
 
             String json = gson.toJson(meta);
@@ -372,7 +371,6 @@ public class DFS {
             String s = metaData.toString();
             InputStream input = new FileStream(s.getBytes());
             writeMetaData(input);
-
 
 
         } else {
