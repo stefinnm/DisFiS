@@ -15,15 +15,15 @@ public class Client
         Scanner in = new Scanner(System.in);
         
         while(true){
-            System.out.println("1. Join");
-            System.out.println("2. ls");
-            System.out.println("3. Rename(mv)");
-            System.out.println("4. Add File");
-            System.out.println("5. Delete File");
-            System.out.println("6. Read");
-            System.out.println("7. Tail");
-            System.out.println("8. Head");
-            System.out.println("9. Append");
+            System.out.println("1.  Join");
+            System.out.println("2.  ls");
+            System.out.println("3.  Rename(mv)");
+            System.out.println("4.  Add File");
+            System.out.println("5.  Delete File");
+            System.out.println("6.  Read");
+            System.out.println("7.  Tail");
+            System.out.println("8.  Head");
+            System.out.println("9.  Append");
             System.out.println("10. Quit");
             System.out.print("$ ");
             
@@ -89,12 +89,10 @@ public class Client
     }
 
     static public void main(String args[]) throws Exception {
-//        if (args.length < 1 ) {
-//            throw new IllegalArgumentException("Parameter: <port>");
-//        }
-    	
-//        Client client=new Client( Integer.parseInt(args[0]));
-        Client client=new Client(3003);
+        System.out.print("Enter port to connect to: ");
+        Scanner in = new Scanner(System.in);
+        
+    	Client client=new Client(in.nextInt());
 
      } 
 }
