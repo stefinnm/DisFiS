@@ -1,7 +1,11 @@
 public class Page {
     private int number;
-    private int guid;
+    private long guid;
     private int size;
 
-    String content;
+    public Page(int n, long g, int s){
+        number = n;
+        guid = g;
+        size = s;
+    }
 }
