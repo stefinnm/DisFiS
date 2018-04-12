@@ -74,18 +74,9 @@ public class Client
                 System.out.println(new String(head).replace("/n","\n"));
             }
             else if(choice == 9){
-                System.out.println("Please enter file name");
+                System.out.println("Enter the name of file to append to:");
                 String fileName = in.nextLine();
-                System.out.println("Please enter file content");
-                String content = in.nextLine();
-                Scanner sc = new Scanner(new File(content));
-                StringBuilder sb = new StringBuilder();
-                while(sc.hasNextLine())
-                {
-                    sb.append(sc.nextLine() + "/n");
-                }
-                content = sb.toString();
-                byte[] b = content.getBytes();
+                byte[] b = Files.readAllBytes(Paths.get("test.txt"));
                 dfs.append(fileName, b);
             }
             else if(choice == 10){
