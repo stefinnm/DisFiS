@@ -7,94 +7,65 @@ import java.security.*;
 import java.nio.file.*;
 
 
-public class Client
-{
+public class Client{
+    
     DFS dfs;
     public Client(int p) throws Exception {
         dfs = new DFS(p);
         Scanner in = new Scanner(System.in);
-        
-        while(true){
-            System.out.println("1. Join");
-            System.out.println("2. ls");
-            System.out.println("3. Rename(mv)");
-            System.out.println("4. Add File");
-            System.out.println("5. Delete File");
-            System.out.println("6. Read");
-            System.out.println("7. Tail");
-            System.out.println("8. Head");
-            System.out.println("9. Append");
-            System.out.println("10. Quit");
-            System.out.print("$ ");
-            
-            int choice = in.nextInt();
-            in.nextLine();
-            if(choice == 1){
-                System.out.print("Enter port: ");
-                int port = in.nextInt();
-                in.nextLine();
-                dfs.join(InetAddress.getLocalHost().toString(), port);
-            }
-            else if(choice == 2){
-                System.out.println(dfs.ls());
-            }
-            else if(choice == 3){
-                System.out.print("Enter file to rename: ");
-                String oldName = in.nextLine();
-                System.out.print("Enter new name for file " + oldName + ": ");
-                String newName = in.nextLine();
-                dfs.mv(oldName, newName);
-            }
-            else if(choice == 4){
-                System.out.print("Enter file to add: ");
-                String newFile = in.nextLine();
-                dfs.touch(newFile); 
-            }
-            else if(choice == 5){
-                System.out.print("Enter file to delete: ");
-                String deleteFile = in.nextLine();
-                dfs.delete(deleteFile);
-            }
-            else if(choice == 6){
-                System.out.println("Please enter file name");
-                String fileName = in.nextLine();
-                dfs.touch(fileName);
 
-            }
-            else if(choice == 7){
-                System.out.println("Please enter file name");
-                String fileName = in.nextLine();
-                byte[] tail = dfs.tail(fileName);
-                System.out.println(new String(tail).replace("/n","\n"));
-            }
-            else if(choice == 8){
-                System.out.println("Please enter file name");
-                String fileName = in.nextLine();
-                byte[] head = dfs.head(fileName);
-                System.out.println(new String(head).replace("/n","\n"));
-            }
-            else if(choice == 9){
-                System.out.println("Enter the name of file to append to:");
-                String fileName = in.nextLine();
-                byte[] b = Files.readAllBytes(Paths.get("test.txt"));
-                dfs.append(fileName, b);
-            }
-            else if(choice == 10){
-                break;
-
+        while(true) {
+            System.out.print("Enter command: $ ");
+            String[] choice = in.nextLine().split(" ");
+            String command = choice[0];
+            if (choice.length == 1) {
+                if (command.equals("ls")) {
+                    System.out.println(dfs.ls());
+                } else if (command.equals("exit") || command.equals("quit")) {
+                    break;
+                } else {
+                    System.out.println("Invalid command.");
+                }
+            } else if (choice.length == 2) {
+                if (command.equals("join")) {
+                    dfs.join("localHost", Integer.parseInt(choice[1]));
+                } else if (command.equals("touch")) {
+                    dfs.touch(choice[1]);
+                } else if (command.equals("delete")) {
+                    dfs.delete(choice[1]);
+                } else if (command.equals("tail")) {
+                    byte[] tail = dfs.tail(choice[1]);
+                    System.out.println(new String(tail).replace("/n", "\n"));
+                } else if (command.equals("head")) {
+                    byte[] head = dfs.head(choice[1]);
+                    System.out.println(new String(head).replace("/n", "\n"));
+                } else if (command.equals("append")) {
+                    System.out.println("Appending the contents of \"append.txt\" to the end of " + choice[1]);
+                    byte[] b = Files.readAllBytes(Paths.get("append.txt"));
+                    dfs.append(choice[1], b);
+                } else {
+                    System.out.println("Invalid command.");
+                }
+            } else if (choice.length == 3) {
+                if (command.equals("read")) {
+                    System.out.println(new String(dfs.read(choice[1], Integer.parseInt(choice[2]))));
+                } else if (command.equals("mv")){
+                    dfs.mv(choice[1], choice[2]);
+                } else {
+                    System.out.println("Invalid command.");
+                }
             }
         }
         in.close();
+        System.out.println("Closing connection to DFS.\nGoodbye.");
         System.exit(0);
     }
 
     static public void main(String args[]) throws Exception {
-//        if (args.length < 1 ) {
-//            throw new IllegalArgumentException("Parameter: <port>");
-//        }
-    	
-//        Client client=new Client( Integer.parseInt(args[0]));
-        Client client=new Client(3003);
-
-     } 
+        System.out.print("Please enter the port number you would like to connect to: ");
+        Scanner in = new Scanner(System.in);
+        int port = in.nextInt();
+        Client client=new Client(port);
+    }
 }
+
