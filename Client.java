@@ -10,6 +10,11 @@ import java.nio.file.*;
 public class Client{
     
     DFS dfs;
+    /**
+     * Constructor for the Client class which is the user interface for this program.
+     * @param p port number to connect to
+     * @throws Exception when an incorrect port is specified. 
+     */
     public Client(int p) throws Exception {
         dfs = new DFS(p);
         Scanner in = new Scanner(System.in);
@@ -60,7 +65,11 @@ public class Client{
         System.out.println("Closing connection to DFS.\nGoodbye.");
         System.exit(0);
     }
-
+    /**
+     * The main class for the program. It called the client constructor with the port number a user specified.
+     * @param args arguments a user passes in when running this program.
+     * @throws Exception 
+     */
     static public void main(String args[]) throws Exception {
         System.out.print("Please enter the port number you would like to connect to: ");
         Scanner in = new Scanner(System.in);
