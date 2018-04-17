@@ -10,6 +10,11 @@ import java.nio.file.*;
 public class Client{
     
     DFS dfs;
+    /**
+     * Constructor for the Client class which is the user interface for this program.
+     * @param p port number to connect to
+     * @throws Exception when an incorrect port is specified. 
+     */
     public Client(int p) throws Exception {
         dfs = new DFS(p);
         Scanner in = new Scanner(System.in);
